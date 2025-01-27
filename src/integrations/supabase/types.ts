@@ -9,7 +9,112 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          appointment_date: string
+          appointment_time: string
+          created_at: string
+          doctor_id: string
+          id: string
+          patient_email: string
+          patient_name: string
+          patient_phone: string
+          reason: string | null
+          status: string | null
+        }
+        Insert: {
+          appointment_date: string
+          appointment_time: string
+          created_at?: string
+          doctor_id: string
+          id?: string
+          patient_email: string
+          patient_name: string
+          patient_phone: string
+          reason?: string | null
+          status?: string | null
+        }
+        Update: {
+          appointment_date?: string
+          appointment_time?: string
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          patient_email?: string
+          patient_name?: string
+          patient_phone?: string
+          reason?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      availability: {
+        Row: {
+          created_at: string
+          day_of_week: number
+          doctor_id: string
+          end_time: string
+          id: string
+          start_time: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: number
+          doctor_id: string
+          end_time: string
+          id?: string
+          start_time: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number
+          doctor_id?: string
+          end_time?: string
+          id?: string
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "availability_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doctors: {
+        Row: {
+          created_at: string
+          department: string
+          email: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          department: string
+          email: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          department?: string
+          email?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
