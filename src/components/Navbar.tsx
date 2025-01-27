@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import AppointmentModal from "./AppointmentModal";
 
 const Navbar = () => {
   return (
@@ -15,7 +16,7 @@ const Navbar = () => {
             <a href="#about" className="text-gray-600 hover:text-primary">About</a>
             <a href="#services" className="text-gray-600 hover:text-primary">Services</a>
             <a href="#partners" className="text-gray-600 hover:text-primary">Partners</a>
-            <Button>Book Appointment</Button>
+            <AppointmentModal />
           </div>
         </div>
       </div>
