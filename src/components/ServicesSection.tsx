@@ -4,7 +4,7 @@ import {
   Brain, 
   Baby, 
   Bone, 
-  FirstAid 
+  Hospital 
 } from "lucide-react";
 
 const services = [
@@ -34,7 +34,7 @@ const services = [
     description: "Treatment for bone and joint conditions"
   },
   {
-    icon: FirstAid,
+    icon: Hospital,
     title: "Emergency Care",
     description: "24/7 emergency medical services"
   }
