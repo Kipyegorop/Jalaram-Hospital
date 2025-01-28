@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
@@ -51,6 +52,7 @@ const departments = [
 ];
 
 const AppointmentForm = () => {
+  const navigate = useNavigate();
   const [date, setDate] = useState<Date>();
   const [countdown, setCountdown] = useState<number | null>(null);
   
@@ -121,12 +123,13 @@ const AppointmentForm = () => {
       // Send confirmation email
       await sendConfirmationEmail(data);
       
-      // Start countdown
+      // Start countdown and redirect
       setCountdown(5);
       const countdownInterval = setInterval(() => {
         setCountdown((prev) => {
           if (prev === null || prev <= 1) {
             clearInterval(countdownInterval);
+            navigate("/");
             return null;
           }
           return prev - 1;
