@@ -88,9 +88,12 @@ const AppointmentForm = () => {
       .from('doctors')
       .select('id')
       .eq('department', department)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) {
+      throw new Error(`No doctor available for ${department} department`);
+    }
     return data.id;
   };
 
@@ -141,7 +144,7 @@ const AppointmentForm = () => {
       console.error('Error scheduling appointment:', error);
       toast({
         title: "Error",
-        description: "Failed to schedule appointment. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to schedule appointment. Please try again.",
         variant: "destructive",
       });
     }
