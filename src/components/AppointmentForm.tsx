@@ -83,23 +83,35 @@ const AppointmentForm = () => {
     }
   };
 
+  const getDoctorByDepartment = async (department: string) => {
+    const { data, error } = await supabase
+      .from('doctors')
+      .select('id')
+      .eq('department', department)
+      .single();
+
+    if (error) throw error;
+    return data.id;
+  };
+
   const onSubmit = async (data: AppointmentFormData) => {
     try {
+      // Get doctor ID for the selected department
+      const doctorId = await getDoctorByDepartment(data.department);
+
       // Save appointment to database
       const { error } = await supabase
         .from('appointments')
-        .insert([
-          {
-            patient_name: data.name,
-            patient_email: data.email,
-            patient_phone: data.phone,
-            appointment_date: date?.toISOString().split('T')[0],
-            appointment_time: data.time,
-            reason: data.reason,
-            department: data.department,
-            status: 'pending',
-          },
-        ]);
+        .insert({
+          patient_name: data.name,
+          patient_email: data.email,
+          patient_phone: data.phone,
+          appointment_date: date?.toISOString().split('T')[0],
+          appointment_time: data.time,
+          reason: data.reason,
+          doctor_id: doctorId,
+          status: 'pending',
+        });
 
       if (error) throw error;
 
