@@ -32,11 +32,21 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Map Section - Placeholder */}
+          {/* Map Section */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Location</h3>
-            <div className="w-full h-[300px] bg-muted flex items-center justify-center">
-              <p className="text-muted-foreground">Google Maps placeholder - Add your map iframe here</p>
+            <div className="w-full h-[300px] overflow-hidden rounded-lg shadow-lg">
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d556.1469124426483!2d36.10532634796107!3d-0.2851954882875866!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1829932ca9ba401f%3A0xe28bff3b81c93921!2sJalaram%20Diagnostics%20Center%20Nakuru!5e0!3m2!1sen!2ske!4v1737967530455!5m2!1sen!2ske"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Hospital Location"
+                className="w-full h-full"
+              />
             </div>
           </div>
         </div>
