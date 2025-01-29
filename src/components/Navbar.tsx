@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import AppointmentModal from "./AppointmentModal";
+import { LogIn } from "lucide-react";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
   return (
     <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-sm z-50 shadow-sm">
       <div className="container mx-auto px-4 py-4">
@@ -17,6 +21,14 @@ const Navbar = () => {
             <a href="#services" className="text-gray-600 hover:text-primary">Services</a>
             <a href="#partners" className="text-gray-600 hover:text-primary">Partners</a>
             <AppointmentModal />
+            <Button 
+              variant="outline"
+              onClick={() => navigate("/doctor-auth")}
+              className="flex items-center gap-2"
+            >
+              <LogIn className="w-4 h-4" />
+              Doctor Login
+            </Button>
           </div>
         </div>
       </div>
