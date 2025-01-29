@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Phone, Clock, Mail, MessageSquare } from "lucide-react";
+import { Phone, Clock, Mail, MessageSquare, LogOut } from "lucide-react";
 
 interface Appointment {
   id: string;
@@ -36,11 +37,36 @@ const DoctorDashboard = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [cancelReason, setCancelReason] = useState("");
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [doctorName, setDoctorName] = useState("");
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    fetchDoctorInfo();
     fetchAppointments();
   }, []);
+
+  const fetchDoctorInfo = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: doctorData } = await supabase
+        .from("doctors")
+        .select("name")
+        .eq("email", user.email)
+        .single();
+      
+      if (doctorData) {
+        // Extract first name
+        const firstName = doctorData.name.split(' ')[0];
+        setDoctorName(firstName);
+      }
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/doctor-auth");
+  };
 
   const fetchAppointments = async () => {
     const { data, error } = await supabase
@@ -136,75 +162,94 @@ const DoctorDashboard = () => {
   };
 
   return (
-    <div className="container mx-auto py-10 min-h-screen bg-[url('/background.jpg')] bg-cover bg-center bg-no-repeat">
-      <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 shadow-xl">
-        <h1 className="text-3xl font-bold mb-6 text-primary">Doctor Dashboard</h1>
-        <p className="text-gray-600 mb-6">
-          Welcome to your appointment management dashboard. Here you can view and manage all patient appointments.
-        </p>
-        
-        <div className="rounded-md border bg-white">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Patient Name</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Time</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Booked At</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {appointments.map((appointment) => (
-                <TableRow key={appointment.id}>
-                  <TableCell>{appointment.patient_name}</TableCell>
-                  <TableCell>{new Date(appointment.appointment_date).toLocaleDateString()}</TableCell>
-                  <TableCell>{appointment.appointment_time}</TableCell>
-                  <TableCell className="space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handlePhoneCall(appointment.patient_phone)}
-                    >
-                      <Phone className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleWhatsApp(appointment.patient_phone)}
-                    >
-                      <MessageSquare className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-gray-500" />
-                      {new Date(appointment.created_at).toLocaleString()}
-                    </div>
-                  </TableCell>
-                  <TableCell>{appointment.status}</TableCell>
-                  <TableCell className="space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => updateAppointmentStatus(appointment, "confirmed")}
-                    >
-                      Confirm
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSelectedAppointment(appointment)}
-                    >
-                      Cancel
-                    </Button>
-                  </TableCell>
+    <div className="min-h-screen bg-[url('/background.jpg')] bg-cover bg-center bg-no-repeat">
+      {/* Navigation Bar */}
+      <nav className="bg-white/80 backdrop-blur-sm shadow-sm p-4">
+        <div className="container mx-auto flex justify-between items-center">
+          <div className="text-xl font-semibold text-primary">
+            Welcome, Dr. {doctorName}
+          </div>
+          <Button
+            variant="outline"
+            onClick={handleLogout}
+            className="flex items-center gap-2"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </Button>
+        </div>
+      </nav>
+
+      <div className="container mx-auto py-10">
+        <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 shadow-xl">
+          <h1 className="text-3xl font-bold mb-6 text-primary">Appointments Dashboard</h1>
+          <p className="text-gray-600 mb-6">
+            Manage your patient appointments and schedule from this central dashboard.
+          </p>
+          
+          <div className="rounded-md border bg-white">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Patient Name</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Time</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Booked At</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {appointments.map((appointment) => (
+                  <TableRow key={appointment.id}>
+                    <TableCell>{appointment.patient_name}</TableCell>
+                    <TableCell>{new Date(appointment.appointment_date).toLocaleDateString()}</TableCell>
+                    <TableCell>{appointment.appointment_time}</TableCell>
+                    <TableCell className="space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handlePhoneCall(appointment.patient_phone)}
+                      >
+                        <Phone className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleWhatsApp(appointment.patient_phone)}
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-gray-500" />
+                        {new Date(appointment.created_at).toLocaleString()}
+                      </div>
+                    </TableCell>
+                    <TableCell>{appointment.status}</TableCell>
+                    <TableCell className="space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => updateAppointmentStatus(appointment, "confirmed")}
+                      >
+                        Confirm
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedAppointment(appointment)}
+                      >
+                        Cancel
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </div>
 
