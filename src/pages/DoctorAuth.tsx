@@ -1,13 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { LogIn, Mail } from "lucide-react";
+import { LogIn, Mail, Lock } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const DoctorAuth = () => {
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -60,6 +63,31 @@ const DoctorAuth = () => {
     }
   };
 
+  const handleEmailPasswordSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        navigate('/doctor-dashboard');
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to sign in. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
@@ -70,16 +98,29 @@ const DoctorAuth = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button
-            variant="outline"
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-            className="w-full"
-          >
-            <LogIn className="mr-2 h-4 w-4" />
-            Continue with Google
-          </Button>
-          
+          <form onSubmit={handleEmailPasswordSignIn} className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              <Lock className="mr-2 h-4 w-4" />
+              Sign in with Email
+            </Button>
+          </form>
+
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
@@ -93,12 +134,22 @@ const DoctorAuth = () => {
 
           <Button
             variant="outline"
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            className="w-full"
+          >
+            <LogIn className="mr-2 h-4 w-4" />
+            Continue with Google
+          </Button>
+          
+          <Button
+            variant="outline"
             onClick={handleEmailSignIn}
             disabled={loading}
             className="w-full"
           >
             <Mail className="mr-2 h-4 w-4" />
-            Email Link
+            Magic Link
           </Button>
         </CardContent>
       </Card>
