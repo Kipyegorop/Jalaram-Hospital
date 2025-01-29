@@ -9,21 +9,21 @@ import { Button } from "@/components/ui/button";
 
 const slides = [
   {
-    image: "https://images.unsplash.com/photo-1538108149393-fbbd81895907?auto=format&fit=crop&q=80",
+    image: "https://images.pexels.com/photos/247786/pexels-photo-247786.jpeg",
     title: "Welcome to Our Hospital",
     description: "Providing Quality Healthcare Services",
     primaryButton: "Book Appointment",
     secondaryButton: "Learn More"
   },
   {
-    image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80",
+    image: "https://images.pexels.com/photos/3259624/pexels-photo-3259624.jpeg",
     title: "Expert Medical Care",
     description: "Advanced Technology & Experienced Professionals",
     primaryButton: "Our Services",
     secondaryButton: "Contact Us"
   },
   {
-    image: "https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&q=80",
+    image: "https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg",
     title: "24/7 Emergency Care",
     description: "Always Ready to Help You",
     primaryButton: "Emergency Contact",
