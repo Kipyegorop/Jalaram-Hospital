@@ -6,6 +6,8 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
+import Autoplay from "embla-carousel-autoplay";
+import { useRef } from "react";
 
 const slides = [
   {
@@ -32,9 +34,18 @@ const slides = [
 ];
 
 const HeroSection = () => {
+  const plugin = useRef(
+    Autoplay({ delay: 5000, stopOnInteraction: true })
+  );
+
   return (
     <section className="relative">
-      <Carousel className="w-full">
+      <Carousel 
+        className="w-full"
+        plugins={[plugin.current]}
+        onMouseEnter={plugin.current.stop}
+        onMouseLeave={plugin.current.reset}
+      >
         <CarouselContent>
           {slides.map((slide, index) => (
             <CarouselItem key={index}>
@@ -44,7 +55,7 @@ const HeroSection = () => {
                   alt={slide.title}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black/50">
+                <div className="absolute inset-0 bg-[#221F26]/60">
                   <div className="container mx-auto px-4 h-full flex items-center">
                     <div className="max-w-2xl text-white">
                       <h1 className="text-5xl font-bold mb-4">{slide.title}</h1>
