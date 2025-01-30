@@ -33,12 +33,12 @@ const slides = [
 
 const HeroSection = () => {
   return (
-    <section className="pt-16 min-h-screen relative">
+    <section className="relative">
       <Carousel className="w-full">
         <CarouselContent>
           {slides.map((slide, index) => (
             <CarouselItem key={index}>
-              <div className="relative h-[600px]">
+              <div className="relative h-[calc(100vh-4rem)]">
                 <img
                   src={slide.image}
                   alt={slide.title}
