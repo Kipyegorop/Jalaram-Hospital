@@ -19,7 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Phone, Clock, Mail, MessageSquare, LogOut } from "lucide-react";
+import { Phone, Clock, Mail, MessageSquare, LogOut, Calendar, Users, Activity } from "lucide-react";
 
 interface Appointment {
   id: string;
@@ -162,17 +162,20 @@ const DoctorDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[url('/background.jpg')] bg-cover bg-center bg-no-repeat">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Navigation Bar */}
-      <nav className="bg-white/80 backdrop-blur-sm shadow-sm p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="text-xl font-semibold text-primary">
-            Welcome, Dr. {doctorName}
+      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+        <div className="container mx-auto flex justify-between items-center py-4">
+          <div className="flex items-center gap-2">
+            <Activity className="h-6 w-6 text-primary" />
+            <span className="text-xl font-semibold text-primary">
+              Welcome, Dr. {doctorName}
+            </span>
           </div>
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={handleLogout}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 hover:bg-gray-100"
           >
             <LogOut className="w-4 h-4" />
             Logout
@@ -180,70 +183,131 @@ const DoctorDashboard = () => {
         </div>
       </nav>
 
-      <div className="container mx-auto py-10">
-        <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 shadow-xl">
-          <h1 className="text-3xl font-bold mb-6 text-primary">Appointments Dashboard</h1>
-          <p className="text-gray-600 mb-6">
-            Manage your patient appointments and schedule from this central dashboard.
-          </p>
+      <div className="container mx-auto py-8">
+        {/* Dashboard Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/10 rounded-full">
+                <Calendar className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Today's Appointments</h3>
+                <p className="text-3xl font-bold text-primary">
+                  {appointments.filter(apt => 
+                    new Date(apt.appointment_date).toDateString() === new Date().toDateString()
+                  ).length}
+                </p>
+              </div>
+            </div>
+          </div>
           
-          <div className="rounded-md border bg-white">
+          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-green-50 rounded-full">
+                <Users className="h-6 w-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Total Patients</h3>
+                <p className="text-3xl font-bold text-green-600">{appointments.length}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-blue-50 rounded-full">
+                <Activity className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Pending Reviews</h3>
+                <p className="text-3xl font-bold text-blue-600">
+                  {appointments.filter(apt => apt.status === "pending").length}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Appointments Table */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+          <div className="p-6 border-b border-gray-100">
+            <h2 className="text-2xl font-semibold text-gray-900">Appointments Overview</h2>
+            <p className="text-gray-500 mt-1">Manage and track your patient appointments</p>
+          </div>
+          
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Patient Name</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Time</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Booked At</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="font-semibold">Patient Name</TableHead>
+                  <TableHead className="font-semibold">Date</TableHead>
+                  <TableHead className="font-semibold">Time</TableHead>
+                  <TableHead className="font-semibold">Contact</TableHead>
+                  <TableHead className="font-semibold">Booked At</TableHead>
+                  <TableHead className="font-semibold">Status</TableHead>
+                  <TableHead className="font-semibold">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {appointments.map((appointment) => (
-                  <TableRow key={appointment.id}>
-                    <TableCell>{appointment.patient_name}</TableCell>
+                  <TableRow key={appointment.id} className="hover:bg-gray-50">
+                    <TableCell className="font-medium">{appointment.patient_name}</TableCell>
                     <TableCell>{new Date(appointment.appointment_date).toLocaleDateString()}</TableCell>
                     <TableCell>{appointment.appointment_time}</TableCell>
-                    <TableCell className="space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handlePhoneCall(appointment.patient_phone)}
-                      >
-                        <Phone className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleWhatsApp(appointment.patient_phone)}
-                      >
-                        <MessageSquare className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-gray-500" />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="hover:bg-primary/10 hover:text-primary"
+                          onClick={() => handlePhoneCall(appointment.patient_phone)}
+                        >
+                          <Phone className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="hover:bg-green-50 hover:text-green-600"
+                          onClick={() => handleWhatsApp(appointment.patient_phone)}
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2 text-gray-500">
+                        <Clock className="h-4 w-4" />
                         {new Date(appointment.created_at).toLocaleString()}
                       </div>
                     </TableCell>
-                    <TableCell>{appointment.status}</TableCell>
-                    <TableCell className="space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => updateAppointmentStatus(appointment, "confirmed")}
-                      >
-                        Confirm
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedAppointment(appointment)}
-                      >
-                        Cancel
-                      </Button>
+                    <TableCell>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                        ${appointment.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                          appointment.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                          'bg-yellow-100 text-yellow-800'}`}>
+                        {appointment.status}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="hover:bg-green-50 hover:text-green-600"
+                          onClick={() => updateAppointmentStatus(appointment, "confirmed")}
+                        >
+                          Confirm
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="hover:bg-red-50 hover:text-red-600"
+                          onClick={() => setSelectedAppointment(appointment)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -253,17 +317,19 @@ const DoctorDashboard = () => {
         </div>
       </div>
 
+      {/* Cancel Appointment Dialog */}
       <Dialog open={!!selectedAppointment} onOpenChange={() => setSelectedAppointment(null)}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Cancel Appointment</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <p>Please provide a reason for cancelling this appointment:</p>
+            <p className="text-gray-500">Please provide a reason for cancelling this appointment:</p>
             <Input
               placeholder="Enter cancellation reason"
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
+              className="w-full"
             />
           </div>
           <DialogFooter>
