@@ -44,6 +44,27 @@ const DoctorDashboard = () => {
   useEffect(() => {
     fetchDoctorInfo();
     fetchAppointments();
+
+    // Set up real-time subscription for appointment updates
+    const channel = supabase
+      .channel('appointments-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'appointments'
+        },
+        (payload) => {
+          console.log('Real-time update:', payload);
+          fetchAppointments(); // Refresh appointments when changes occur
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchDoctorInfo = async () => {
@@ -69,9 +90,31 @@ const DoctorDashboard = () => {
   };
 
   const fetchAppointments = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      navigate('/doctor-auth');
+      return;
+    }
+
+    const { data: doctorData } = await supabase
+      .from('doctors')
+      .select('id, department')
+      .eq('email', user.email)
+      .single();
+
+    if (!doctorData) {
+      toast({
+        title: "Error",
+        description: "Doctor information not found",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { data, error } = await supabase
       .from("appointments")
       .select("*")
+      .eq('doctor_id', doctorData.id)
       .order("appointment_date", { ascending: true });
 
     if (error) {
