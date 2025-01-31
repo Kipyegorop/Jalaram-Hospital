@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { LogIn, Mail, Lock, Home } from "lucide-react";
+import { LogIn, Mail, Lock, Home, User, Phone, FileText, Building2, BookText } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +29,11 @@ const DoctorAuth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [department, setDepartment] = useState("");
+  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [medicalLicense, setMedicalLicense] = useState("");
+  const [hospitalAffiliation, setHospitalAffiliation] = useState("");
+  const [biography, setBiography] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -109,6 +115,35 @@ const DoctorAuth = () => {
       if (error) throw error;
 
       if (data.user) {
+        // Update doctor's profile with additional information if provided
+        if (name || phoneNumber || medicalLicense || hospitalAffiliation || biography) {
+          const { error: updateError } = await supabase
+            .from('doctors')
+            .update({
+              name: name || doctorData.name,
+              phone_number: phoneNumber || doctorData.phone_number,
+              medical_license: medicalLicense || doctorData.medical_license,
+              hospital_affiliation: hospitalAffiliation || doctorData.hospital_affiliation,
+              biography: biography || doctorData.biography,
+              is_profile_complete: true
+            })
+            .eq('id', doctorData.id);
+
+          if (updateError) {
+            console.error('Error updating profile:', updateError);
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: "Failed to update profile information.",
+            });
+          } else {
+            toast({
+              title: "Success",
+              description: "Profile updated successfully.",
+            });
+          }
+        }
+
         navigate('/doctor-dashboard');
       }
     } catch (error: any) {
@@ -139,23 +174,31 @@ const DoctorAuth = () => {
             Sign in to access your appointments and manage your schedule
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent>
           <form onSubmit={handleEmailPasswordSignIn} className="space-y-4">
             <div className="space-y-2">
-              <Input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <Input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="flex items-center space-x-2">
+                <Mail className="h-4 w-4 text-gray-500" />
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Lock className="h-4 w-4 text-gray-500" />
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+
               <Select
                 value={department}
                 onValueChange={setDepartment}
@@ -171,10 +214,71 @@ const DoctorAuth = () => {
                   ))}
                 </SelectContent>
               </Select>
+
+              <div className="pt-4">
+                <CardDescription className="mb-2">
+                  Optional: Update your profile information
+                </CardDescription>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <User className="h-4 w-4 text-gray-500" />
+                    <Input
+                      placeholder="Full Name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Phone className="h-4 w-4 text-gray-500" />
+                    <Input
+                      placeholder="Phone Number"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <FileText className="h-4 w-4 text-gray-500" />
+                    <Input
+                      placeholder="Medical License Number"
+                      value={medicalLicense}
+                      onChange={(e) => setMedicalLicense(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Building2 className="h-4 w-4 text-gray-500" />
+                    <Input
+                      placeholder="Hospital Affiliation"
+                      value={hospitalAffiliation}
+                      onChange={(e) => setHospitalAffiliation(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <BookText className="h-4 w-4 text-gray-500" />
+                    <Textarea
+                      placeholder="Professional Biography"
+                      value={biography}
+                      onChange={(e) => setBiography(e.target.value)}
+                      className="min-h-[100px]"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
+
             <Button type="submit" className="w-full" disabled={loading || !department}>
-              <Lock className="mr-2 h-4 w-4" />
-              Sign in
+              {loading ? (
+                "Signing in..."
+              ) : (
+                <>
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign in
+                </>
+              )}
             </Button>
           </form>
         </CardContent>

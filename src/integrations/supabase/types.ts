@@ -93,36 +93,51 @@ export type Database = {
       }
       doctors: {
         Row: {
+          biography: string | null
           contact_details: string | null
           created_at: string
           department: string
           email: string
           experience: string | null
+          hospital_affiliation: string | null
           id: string
           is_profile_complete: boolean | null
+          medical_license: string | null
           name: string
+          phone_number: string | null
+          profile_picture: string | null
           specialization: string | null
         }
         Insert: {
+          biography?: string | null
           contact_details?: string | null
           created_at?: string
           department: string
           email: string
           experience?: string | null
+          hospital_affiliation?: string | null
           id?: string
           is_profile_complete?: boolean | null
+          medical_license?: string | null
           name: string
+          phone_number?: string | null
+          profile_picture?: string | null
           specialization?: string | null
         }
         Update: {
+          biography?: string | null
           contact_details?: string | null
           created_at?: string
           department?: string
           email?: string
           experience?: string | null
+          hospital_affiliation?: string | null
           id?: string
           is_profile_complete?: boolean | null
+          medical_license?: string | null
           name?: string
+          phone_number?: string | null
+          profile_picture?: string | null
           specialization?: string | null
         }
         Relationships: []
