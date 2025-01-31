@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -6,28 +7,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import AppointmentForm from "./AppointmentForm";
 
-interface AppointmentModalProps {
-  triggerClassName?: string;
-}
-
-const AppointmentModal = ({ triggerClassName }: AppointmentModalProps) => {
+const AppointmentModal = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className={triggerClassName}>Book Appointment</Button>
+        <Button className="bg-transparent hover:bg-white/10 text-white border-white">
+          Book Appointment
+        </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] h-[90vh] sm:h-auto">
         <DialogHeader>
-          <DialogTitle>Schedule an Appointment</DialogTitle>
+          <DialogTitle>Book an Appointment</DialogTitle>
           <DialogDescription>
-            Fill out the form below to schedule your appointment. We'll send you a
-            confirmation email with the details.
+            Fill in your details below to schedule an appointment with one of our doctors.
           </DialogDescription>
         </DialogHeader>
-        <AppointmentForm />
+        <ScrollArea className="h-[calc(90vh-120px)] sm:h-auto px-1">
+          <AppointmentForm />
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
