@@ -11,6 +11,14 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
   Table,
   TableBody,
   TableCell,
@@ -20,6 +28,14 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Phone, Clock, Mail, MessageSquare, LogOut, Calendar, Users, Activity } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Textarea } from "@/components/ui/textarea";
+
+interface ProfileFormValues {
+  specialization: string;
+  experience: string;
+  contact_details: string;
+}
 
 interface Appointment {
   id: string;
@@ -38,10 +54,13 @@ const DoctorDashboard = () => {
   const [cancelReason, setCancelReason] = useState("");
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [doctorName, setDoctorName] = useState("");
+  const [showProfileForm, setShowProfileForm] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const form = useForm<ProfileFormValues>();
 
   useEffect(() => {
+    checkProfileCompletion();
     fetchDoctorInfo();
     fetchAppointments();
 
@@ -66,6 +85,58 @@ const DoctorDashboard = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  const checkProfileCompletion = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: doctorData, error } = await supabase
+        .from("doctors")
+        .select("is_profile_complete")
+        .eq("email", user.email)
+        .single();
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch doctor profile",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!doctorData.is_profile_complete) {
+        setShowProfileForm(true);
+      }
+    }
+  };
+
+  const onProfileSubmit = async (data: ProfileFormValues) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("doctors")
+      .update({
+        ...data,
+        is_profile_complete: true
+      })
+      .eq("email", user.email);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Success",
+      description: "Profile updated successfully",
+    });
+    setShowProfileForm(false);
+  };
 
   const fetchDoctorInfo = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -206,6 +277,60 @@ const DoctorDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <Dialog open={showProfileForm} onOpenChange={setShowProfileForm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Complete Your Profile</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onProfileSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="specialization"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Specialization</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter your specialization" required />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="experience"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Experience</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Years of experience" required />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="contact_details"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contact Details</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} placeholder="Enter your contact details" required />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button type="submit">Save Profile</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
       {/* Navigation Bar */}
       <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
         <div className="container mx-auto flex justify-between items-center py-4">
