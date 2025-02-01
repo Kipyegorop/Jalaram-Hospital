@@ -1,37 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-
-interface AppointmentFormData {
-  name: string;
-  email: string;
-  phone: string;
-  date: Date;
-  time: string;
-  reason: string;
-  department: string;
-}
+import PersonalInfoFields from "./appointment/PersonalInfoFields";
+import AppointmentTimeFields from "./appointment/AppointmentTimeFields";
+import DepartmentField from "./appointment/DepartmentField";
+import type { AppointmentFormData } from "./appointment/types";
 
 const timeSlots = [
   "09:00 AM",
@@ -101,10 +79,8 @@ const AppointmentForm = () => {
 
   const onSubmit = async (data: AppointmentFormData) => {
     try {
-      // Get doctor ID for the selected department
       const doctorId = await getDoctorByDepartment(data.department);
 
-      // Save appointment to database
       const { error } = await supabase
         .from('appointments')
         .insert({
@@ -120,10 +96,8 @@ const AppointmentForm = () => {
 
       if (error) throw error;
 
-      // Send confirmation email
       await sendConfirmationEmail(data);
       
-      // Start countdown and redirect
       setCountdown(5);
       const countdownInterval = setInterval(() => {
         setCountdown((prev) => {
@@ -167,107 +141,13 @@ const AppointmentForm = () => {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="John Doe" {...field} required />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input type="email" placeholder="john@example.com" {...field} required />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone Number</FormLabel>
-                <FormControl>
-                  <Input placeholder="+254 XXX XXX XXX" {...field} required />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="department"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Department</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a department" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {departments.map((dept) => (
-                      <SelectItem key={dept} value={dept}>
-                        {dept}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="space-y-2">
-            <FormLabel>Preferred Date</FormLabel>
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              className="rounded-md border"
-              disabled={(date) => date < new Date() || date.getDay() === 0}
-            />
-          </div>
-
-          <FormField
-            control={form.control}
-            name="time"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Preferred Time</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a time slot" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {timeSlots.map((time) => (
-                      <SelectItem key={time} value={time}>
-                        {time}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
+          <PersonalInfoFields form={form} />
+          <DepartmentField form={form} departments={departments} />
+          <AppointmentTimeFields 
+            form={form}
+            date={date}
+            setDate={setDate}
+            timeSlots={timeSlots}
           />
 
           <FormField
