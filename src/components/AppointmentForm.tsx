@@ -10,6 +10,8 @@ import PersonalInfoFields from "./appointment/PersonalInfoFields";
 import AppointmentTimeFields from "./appointment/AppointmentTimeFields";
 import DepartmentField from "./appointment/DepartmentField";
 import type { AppointmentFormData } from "./appointment/types";
+import { Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const timeSlots = [
   "09:00 AM",
@@ -33,6 +35,8 @@ const AppointmentForm = () => {
   const navigate = useNavigate();
   const [date, setDate] = useState<Date>();
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const form = useForm<AppointmentFormData>({
     defaultValues: {
@@ -60,6 +64,7 @@ const AppointmentForm = () => {
       if (error) throw error;
     } catch (error) {
       console.error('Error sending confirmation email:', error);
+      throw new Error('Failed to send confirmation email');
     }
   };
 
@@ -78,10 +83,19 @@ const AppointmentForm = () => {
   };
 
   const onSubmit = async (data: AppointmentFormData) => {
+    setIsLoading(true);
+    setError(null);
+
+    if (!date) {
+      setError("Please select an appointment date");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const doctorId = await getDoctorByDepartment(data.department);
 
-      const { error } = await supabase
+      const { error: appointmentError } = await supabase
         .from('appointments')
         .insert({
           patient_name: data.name,
@@ -94,7 +108,7 @@ const AppointmentForm = () => {
           status: 'pending',
         });
 
-      if (error) throw error;
+      if (appointmentError) throw appointmentError;
 
       await sendConfirmationEmail(data);
       
@@ -119,11 +133,14 @@ const AppointmentForm = () => {
       setDate(undefined);
     } catch (error) {
       console.error('Error scheduling appointment:', error);
+      setError(error instanceof Error ? error.message : "Failed to schedule appointment. Please try again.");
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to schedule appointment. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -137,6 +154,12 @@ const AppointmentForm = () => {
             Redirecting to homepage in {countdown} seconds...
           </p>
         </div>
+      )}
+
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
       <Form {...form}>
@@ -167,8 +190,19 @@ const AppointmentForm = () => {
             )}
           />
 
-          <Button type="submit" className="w-full">
-            Schedule Appointment
+          <Button 
+            type="submit" 
+            className="w-full"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Scheduling...
+              </>
+            ) : (
+              'Schedule Appointment'
+            )}
           </Button>
         </form>
       </Form>
