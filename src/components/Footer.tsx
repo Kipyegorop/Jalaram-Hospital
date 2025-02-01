@@ -10,11 +10,10 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
             <address className="not-italic">
-              <p className="mb-2">123 Hospital Street</p>
-              <p className="mb-2">Medical District</p>
-              <p className="mb-2">Nairobi, Kenya</p>
-              <p className="mb-2">Phone: (254) 123-4567</p>
-              <p>Email: info@hospital.com</p>
+              <p className="mb-2">Jalaram Diagnostics Center</p>
+              <p className="mb-2">Nakuru, Kenya</p>
+              <p className="mb-2">Phone: +254795553008</p>
+              <p>Email: brianrop36@gmail.com</p>
             </address>
           </div>
 
@@ -54,7 +53,7 @@ const Footer = () => {
         <Separator className="my-6" />
         
         <div className="text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Hospital Name. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Jalaram Diagnostics. All rights reserved.</p>
         </div>
       </div>
     </footer>

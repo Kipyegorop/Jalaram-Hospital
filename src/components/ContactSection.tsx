@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Phone, Mail, MapPin, Facebook, Twitter, Instagram, Send } from "lucide-react";
+import { Phone, Mail, MapPin, Send } from "lucide-react";
 
 const ContactSection = () => {
   const { toast } = useToast();
@@ -54,9 +54,9 @@ const ContactSection = () => {
               <Phone className="w-6 h-6 text-white mt-1" />
               <div>
                 <h3 className="text-xl font-semibold text-white">Phone</h3>
-                <p className="text-gray-300">+254 712 345 678</p>
+                <p className="text-gray-300">+254795553008</p>
                 <a 
-                  href="https://wa.me/254712345678" 
+                  href="https://wa.me/254795553008" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-green-400 hover:text-green-300 transition-colors"
@@ -70,7 +70,7 @@ const ContactSection = () => {
               <Mail className="w-6 h-6 text-white mt-1" />
               <div>
                 <h3 className="text-xl font-semibold text-white">Email</h3>
-                <p className="text-gray-300">info@hospital.com</p>
+                <p className="text-gray-300">brianrop36@gmail.com</p>
               </div>
             </div>
 
@@ -78,22 +78,7 @@ const ContactSection = () => {
               <MapPin className="w-6 h-6 text-white mt-1" />
               <div>
                 <h3 className="text-xl font-semibold text-white">Address</h3>
-                <p className="text-gray-300">123 Hospital Street, Nairobi, Kenya</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-white">Follow Us</h3>
-              <div className="flex space-x-4">
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-blue-400 transition-colors">
-                  <Facebook className="w-6 h-6" />
-                </a>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-blue-400 transition-colors">
-                  <Twitter className="w-6 h-6" />
-                </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-pink-400 transition-colors">
-                  <Instagram className="w-6 h-6" />
-                </a>
+                <p className="text-gray-300">Jalaram Diagnostics Center, Nakuru, Kenya</p>
               </div>
             </div>
           </div>
