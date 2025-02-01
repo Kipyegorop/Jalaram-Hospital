@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// Available departments for doctors
 const departments = [
   "General Medicine",
   "Pediatrics",
@@ -25,6 +26,7 @@ const departments = [
 ];
 
 const DoctorAuth = () => {
+  // State management for form fields and loading state
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,16 +40,19 @@ const DoctorAuth = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Check if user is already authenticated
     const checkSession = async () => {
+      // Get current session from Supabase
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        // Verify doctor's department before redirecting
+        // If session exists, verify doctor's department
         const { data: doctorData, error } = await supabase
           .from('doctors')
           .select('department')
           .eq('email', session.user.email)
           .single();
 
+        // If doctor data doesn't exist or there's an error, sign out
         if (error || !doctorData) {
           await supabase.auth.signOut();
           toast({
@@ -58,15 +63,17 @@ const DoctorAuth = () => {
           return;
         }
 
+        // If verification successful, redirect to dashboard
         navigate('/doctor-dashboard');
       }
     };
     
     checkSession();
 
+    // Set up real-time auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
-        // Verify doctor's department before redirecting
+        // Verify doctor's department on auth state change
         const { data: doctorData, error } = await supabase
           .from('doctors')
           .select('department')
@@ -87,15 +94,17 @@ const DoctorAuth = () => {
       }
     });
 
+    // Cleanup subscription on component unmount
     return () => subscription.unsubscribe();
   }, [navigate, toast]);
 
+  // Handle form submission
   const handleEmailPasswordSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
 
-      // First verify if the doctor exists in the selected department
+      // Step 1: Verify doctor exists in selected department
       const { data: doctorData, error: doctorError } = await supabase
         .from('doctors')
         .select('*')
@@ -107,6 +116,7 @@ const DoctorAuth = () => {
         throw new Error('You are not authorized for this department.');
       }
 
+      // Step 2: Authenticate with Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -115,7 +125,7 @@ const DoctorAuth = () => {
       if (error) throw error;
 
       if (data.user) {
-        // Update doctor's profile with additional information if provided
+        // Step 3: Update doctor's profile if new information provided
         if (name || phoneNumber || medicalLicense || hospitalAffiliation || biography) {
           const { error: updateError } = await supabase
             .from('doctors')
@@ -129,6 +139,7 @@ const DoctorAuth = () => {
             })
             .eq('id', doctorData.id);
 
+          // Handle profile update errors
           if (updateError) {
             console.error('Error updating profile:', updateError);
             toast({
@@ -144,9 +155,11 @@ const DoctorAuth = () => {
           }
         }
 
+        // Step 4: Redirect to dashboard
         navigate('/doctor-dashboard');
       }
     } catch (error: any) {
+      // Handle authentication errors
       toast({
         variant: "destructive",
         title: "Error",
@@ -159,6 +172,7 @@ const DoctorAuth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      {/* Back to home link */}
       <Link 
         to="/" 
         className="absolute top-4 left-4 p-2 flex items-center gap-2 text-gray-600 hover:text-gray-900"
@@ -167,6 +181,7 @@ const DoctorAuth = () => {
         Back to Home
       </Link>
 
+      {/* Main authentication card */}
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Doctor Portal</CardTitle>
@@ -177,6 +192,7 @@ const DoctorAuth = () => {
         <CardContent>
           <form onSubmit={handleEmailPasswordSignIn} className="space-y-4">
             <div className="space-y-2">
+              {/* Email input field */}
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-gray-500" />
                 <Input
@@ -188,6 +204,7 @@ const DoctorAuth = () => {
                 />
               </div>
               
+              {/* Password input field */}
               <div className="flex items-center space-x-2">
                 <Lock className="h-4 w-4 text-gray-500" />
                 <Input
@@ -199,6 +216,7 @@ const DoctorAuth = () => {
                 />
               </div>
 
+              {/* Department selection */}
               <Select
                 value={department}
                 onValueChange={setDepartment}
@@ -215,12 +233,14 @@ const DoctorAuth = () => {
                 </SelectContent>
               </Select>
 
+              {/* Optional profile update section */}
               <div className="pt-4">
                 <CardDescription className="mb-2">
                   Optional: Update your profile information
                 </CardDescription>
                 
                 <div className="space-y-2">
+                  {/* Name input */}
                   <div className="flex items-center space-x-2">
                     <User className="h-4 w-4 text-gray-500" />
                     <Input
@@ -230,6 +250,7 @@ const DoctorAuth = () => {
                     />
                   </div>
 
+                  {/* Phone number input */}
                   <div className="flex items-center space-x-2">
                     <Phone className="h-4 w-4 text-gray-500" />
                     <Input
@@ -239,6 +260,7 @@ const DoctorAuth = () => {
                     />
                   </div>
 
+                  {/* Medical license input */}
                   <div className="flex items-center space-x-2">
                     <FileText className="h-4 w-4 text-gray-500" />
                     <Input
@@ -248,6 +270,7 @@ const DoctorAuth = () => {
                     />
                   </div>
 
+                  {/* Hospital affiliation input */}
                   <div className="flex items-center space-x-2">
                     <Building2 className="h-4 w-4 text-gray-500" />
                     <Input
@@ -257,6 +280,7 @@ const DoctorAuth = () => {
                     />
                   </div>
 
+                  {/* Biography input */}
                   <div className="flex items-center space-x-2">
                     <BookText className="h-4 w-4 text-gray-500" />
                     <Textarea
@@ -270,6 +294,7 @@ const DoctorAuth = () => {
               </div>
             </div>
 
+            {/* Submit button */}
             <Button type="submit" className="w-full" disabled={loading || !department}>
               {loading ? (
                 "Signing in..."
