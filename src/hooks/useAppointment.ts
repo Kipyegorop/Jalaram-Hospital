@@ -34,6 +34,7 @@ export const useAppointment = () => {
       .from('doctors')
       .select('id')
       .eq('department', department)
+      .limit(1)
       .maybeSingle();
 
     if (error) throw error;
