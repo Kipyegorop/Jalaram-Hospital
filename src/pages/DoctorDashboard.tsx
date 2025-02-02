@@ -30,6 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Phone, Clock, Mail, MessageSquare, LogOut, Calendar, Users, Activity } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
+import { DoctorProfileMenu } from "@/components/DoctorProfileMenu";
 
 interface ProfileFormValues {
   specialization: string;
@@ -277,61 +278,6 @@ const DoctorDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <Dialog open={showProfileForm} onOpenChange={setShowProfileForm}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Complete Your Profile</DialogTitle>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onProfileSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="specialization"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Specialization</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter your specialization" required />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="experience"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Experience</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Years of experience" required />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="contact_details"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Contact Details</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} placeholder="Enter your contact details" required />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <DialogFooter>
-                <Button type="submit">Save Profile</Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Navigation Bar */}
       <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
         <div className="container mx-auto flex justify-between items-center py-4">
           <div className="flex items-center gap-2">
@@ -340,19 +286,30 @@ const DoctorDashboard = () => {
               Welcome, Dr. {doctorName}
             </span>
           </div>
-          <Button
-            variant="ghost"
-            onClick={handleLogout}
-            className="flex items-center gap-2 hover:bg-gray-100"
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </Button>
+          <div className="flex items-center gap-4">
+            <DoctorProfileMenu doctorData={{
+              id: doctorId,
+              name: doctorName,
+              email: doctorEmail,
+              department: doctorDepartment,
+              profile_picture: doctorProfilePicture,
+              specialization: doctorSpecialization,
+              experience: doctorExperience,
+            }} />
+            <Button
+              variant="ghost"
+              onClick={handleLogout}
+              className="flex items-center gap-2 hover:bg-gray-100"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
+          </div>
         </div>
       </nav>
 
+      {/* Dashboard Stats */}
       <div className="container mx-auto py-8">
-        {/* Dashboard Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
