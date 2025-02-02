@@ -58,11 +58,13 @@ const HeroSection = () => {
                 <div className="absolute inset-0 bg-[#221F26]/60">
                   <div className="container mx-auto px-4 h-full flex items-center">
                     <div className="max-w-2xl text-white">
-                      <h1 className="text-5xl font-bold mb-4">{slide.title}</h1>
-                      <p className="text-xl mb-8">{slide.description}</p>
-                      <div className="space-x-4">
-                        <Button size="lg">{slide.primaryButton}</Button>
-                        <Button variant="outline" size="lg">
+                      <h1 className="text-3xl md:text-5xl font-bold mb-4">{slide.title}</h1>
+                      <p className="text-lg md:text-xl mb-8">{slide.description}</p>
+                      <div className="flex flex-col sm:flex-row gap-4 sm:space-x-4">
+                        <Button size="lg" className="w-full sm:w-auto">
+                          {slide.primaryButton}
+                        </Button>
+                        <Button variant="outline" size="lg" className="w-full sm:w-auto">
                           {slide.secondaryButton}
                         </Button>
                       </div>
@@ -73,8 +75,10 @@ const HeroSection = () => {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <div className="hidden md:block">
+          <CarouselPrevious />
+          <CarouselNext />
+        </div>
       </Carousel>
     </section>
   );
