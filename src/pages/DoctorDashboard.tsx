@@ -146,16 +146,16 @@ const DoctorDashboard = () => {
   const fetchDoctorInfo = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      const { data: doctorData, error } = await supabase
+      const { data: doctor, error } = await supabase
         .from("doctors")
         .select("*")
         .eq("email", user.email)
         .single();
       
-      if (doctorData) {
-        setDoctorData(doctorData);
+      if (doctor) {
+        setDoctorData(doctor);
         // Extract first name
-        const firstName = doctorData.name.split(' ')[0];
+        const firstName = doctor.name.split(' ')[0];
         setDoctorName(firstName);
       }
     }
@@ -167,26 +167,7 @@ const DoctorDashboard = () => {
   };
 
   const fetchAppointments = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      navigate('/doctor-auth');
-      return;
-    }
-
-    const { data: doctorData } = await supabase
-      .from('doctors')
-      .select('id, department')
-      .eq('email', user.email)
-      .single();
-
-    if (!doctorData) {
-      toast({
-        title: "Error",
-        description: "Doctor information not found",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!doctorData) return;
 
     const { data, error } = await supabase
       .from("appointments")
@@ -351,7 +332,7 @@ const DoctorDashboard = () => {
           </div>
         </div>
 
-        {/* Appointments Table */}
+      {/* Appointments Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-100">
           <div className="p-6 border-b border-gray-100">
             <h2 className="text-2xl font-semibold text-gray-900">Appointments Overview</h2>
