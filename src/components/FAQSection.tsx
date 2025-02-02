@@ -7,14 +7,9 @@ import {
 } from "@/components/ui/accordion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Database } from "@/integrations/supabase/types";
 
-interface FAQ {
-  id: string;
-  question: string;
-  answer: string;
-  category: string | null;
-  order_index: number | null;
-}
+type FAQ = Database['public']['Tables']['faqs']['Row'];
 
 const FAQSection = () => {
   const { data: faqs, isLoading } = useQuery({
