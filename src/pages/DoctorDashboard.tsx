@@ -31,6 +31,9 @@ import { Phone, Clock, Mail, MessageSquare, LogOut, Calendar, Users, Activity } 
 import { useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
 import { DoctorProfileMenu } from "@/components/DoctorProfileMenu";
+import type { Database } from "@/integrations/supabase/types";
+
+type Doctor = Database['public']['Tables']['doctors']['Row'];
 
 interface ProfileFormValues {
   specialization: string;
@@ -56,6 +59,7 @@ const DoctorDashboard = () => {
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [doctorName, setDoctorName] = useState("");
   const [showProfileForm, setShowProfileForm] = useState(false);
+  const [doctorData, setDoctorData] = useState<Doctor | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   const form = useForm<ProfileFormValues>();
@@ -142,13 +146,14 @@ const DoctorDashboard = () => {
   const fetchDoctorInfo = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      const { data: doctorData } = await supabase
+      const { data: doctorData, error } = await supabase
         .from("doctors")
-        .select("name")
+        .select("*")
         .eq("email", user.email)
         .single();
       
       if (doctorData) {
+        setDoctorData(doctorData);
         // Extract first name
         const firstName = doctorData.name.split(' ')[0];
         setDoctorName(firstName);
@@ -287,15 +292,7 @@ const DoctorDashboard = () => {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <DoctorProfileMenu doctorData={{
-              id: doctorId,
-              name: doctorName,
-              email: doctorEmail,
-              department: doctorDepartment,
-              profile_picture: doctorProfilePicture,
-              specialization: doctorSpecialization,
-              experience: doctorExperience,
-            }} />
+            {doctorData && <DoctorProfileMenu doctorData={doctorData} />}
             <Button
               variant="ghost"
               onClick={handleLogout}
