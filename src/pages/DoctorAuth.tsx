@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { LogIn, Mail, Lock, Home, User, Phone, FileText, Building2, BookText } from "lucide-react";
+import { LogIn, Mail, Lock, Home, User, Phone, FileText } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -104,9 +103,21 @@ const DoctorAuth = () => {
 
   const handleEmailPasswordSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate inputs
+    if (!email || !password || !department) {
+      toast({
+        variant: "destructive",
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
 
+      // First check if the doctor exists in our system
       const { data: doctorData, error: doctorError } = await supabase
         .from('doctors')
         .select('*')
@@ -115,15 +126,36 @@ const DoctorAuth = () => {
         .single();
 
       if (doctorError || !doctorData) {
-        throw new Error('You are not authorized for this department.');
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "You are not authorized for this department or email is not registered.",
+        });
+        return;
       }
 
+      // Attempt to sign in
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message === "Invalid login credentials") {
+          toast({
+            variant: "destructive",
+            title: "Invalid Credentials",
+            description: "Please check your email and password and try again.",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Login Error",
+            description: error.message,
+          });
+        }
+        return;
+      }
 
       if (data.user) {
         if (!doctorData.is_profile_complete) {
@@ -136,7 +168,7 @@ const DoctorAuth = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to sign in. Please try again.",
+        description: error.message || "An unexpected error occurred. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -147,7 +179,7 @@ const DoctorAuth = () => {
     if (!name || !phoneNumber || !medicalLicense) {
       toast({
         variant: "destructive",
-        title: "Error",
+        title: "Missing Information",
         description: "Please fill in all required fields.",
       });
       return;
@@ -157,7 +189,9 @@ const DoctorAuth = () => {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user) throw new Error('No authenticated user found');
+      if (!user) {
+        throw new Error('No authenticated user found');
+      }
 
       const { error: updateError } = await supabase
         .from('doctors')
