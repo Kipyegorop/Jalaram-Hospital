@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,8 +16,42 @@ const ContactSection = () => {
     message: "",
   });
 
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Name Required",
+        description: "Please enter your name.",
+      });
+      return false;
+    }
+
+    if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email)) {
+      toast({
+        variant: "destructive",
+        title: "Valid Email Required",
+        description: "Please enter a valid email address.",
+      });
+      return false;
+    }
+
+    if (!formData.message.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Message Required",
+        description: "Please enter your message.",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) return;
+
     setIsLoading(true);
 
     try {
@@ -27,21 +62,51 @@ const ContactSection = () => {
       if (error) throw error;
 
       toast({
-        title: "Message Sent!",
-        description: "We'll get back to you as soon as possible.",
+        title: "Message Sent Successfully!",
+        description: "Thank you for contacting us. We'll get back to you soon.",
       });
 
+      // Clear form after successful submission
       setFormData({ name: "", email: "", message: "" });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Contact form error:', error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to send message. Please try again.",
+        title: "Failed to Send Message",
+        description: "Please try again later or contact us directly.",
       });
     } finally {
       setIsLoading(false);
     }
   };
+
+  const contactInfo = [
+    {
+      icon: Phone,
+      title: "Phone",
+      content: "+254795553008",
+      extra: (
+        <a 
+          href="https://wa.me/254795553008" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-green-400 hover:text-green-300 transition-colors"
+        >
+          WhatsApp Us
+        </a>
+      )
+    },
+    {
+      icon: Mail,
+      title: "Email",
+      content: "brianrop36@gmail.com"
+    },
+    {
+      icon: MapPin,
+      title: "Address",
+      content: "Jalaram Diagnostics Center, Nakuru, Kenya"
+    }
+  ];
 
   return (
     <section id="contact" className="py-20 bg-[#221F26]">
@@ -50,68 +115,41 @@ const ContactSection = () => {
         
         <div className="grid md:grid-cols-2 gap-12">
           <div className="space-y-8">
-            <div className="flex items-start space-x-4">
-              <Phone className="w-6 h-6 text-white mt-1" />
-              <div>
-                <h3 className="text-xl font-semibold text-white">Phone</h3>
-                <p className="text-gray-300">+254795553008</p>
-                <a 
-                  href="https://wa.me/254795553008" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-green-400 hover:text-green-300 transition-colors"
-                >
-                  WhatsApp Us
-                </a>
+            {contactInfo.map((item, index) => (
+              <div key={index} className="flex items-start space-x-4">
+                <item.icon className="w-6 h-6 text-white mt-1" />
+                <div>
+                  <h3 className="text-xl font-semibold text-white">{item.title}</h3>
+                  <p className="text-gray-300">{item.content}</p>
+                  {item.extra}
+                </div>
               </div>
-            </div>
-
-            <div className="flex items-start space-x-4">
-              <Mail className="w-6 h-6 text-white mt-1" />
-              <div>
-                <h3 className="text-xl font-semibold text-white">Email</h3>
-                <p className="text-gray-300">brianrop36@gmail.com</p>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-4">
-              <MapPin className="w-6 h-6 text-white mt-1" />
-              <div>
-                <h3 className="text-xl font-semibold text-white">Address</h3>
-                <p className="text-gray-300">Jalaram Diagnostics Center, Nakuru, Kenya</p>
-              </div>
-            </div>
+            ))}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <Input
-                placeholder="Your Name"
-                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Input
-                type="email"
-                placeholder="Your Email"
-                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Textarea
-                placeholder="Your Message"
-                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 min-h-[150px]"
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                required
-              />
-            </div>
+            <Input
+              placeholder="Your Name"
+              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+            />
+            <Input
+              type="email"
+              placeholder="Your Email"
+              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+            />
+            <Textarea
+              placeholder="Your Message"
+              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 min-h-[150px]"
+              value={formData.message}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              required
+            />
             <Button 
               type="submit" 
               className="w-full bg-white text-[#221F26] hover:bg-white/90"
