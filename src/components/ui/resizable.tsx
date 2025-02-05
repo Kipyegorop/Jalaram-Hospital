@@ -12,7 +12,6 @@ const ResizablePanelGroup = ({
   const elementRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Cleanup function to disconnect observer
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
@@ -23,18 +22,21 @@ const ResizablePanelGroup = ({
   return (
     <ResizablePrimitive.PanelGroup
       ref={(el) => {
-        elementRef.current = el as HTMLDivElement;
-        // Only create new observer if needed
-        if (el && !observerRef.current) {
-          observerRef.current = new ResizeObserver((entries) => {
-            // Use requestAnimationFrame to throttle updates
-            window.requestAnimationFrame(() => {
-              entries.forEach(() => {
-                // Handle resize if needed
+        if (el) {
+          // Get the DOM element from the panel group
+          const domElement = (el as any).domElement as HTMLDivElement;
+          elementRef.current = domElement;
+          
+          if (domElement && !observerRef.current) {
+            observerRef.current = new ResizeObserver((entries) => {
+              window.requestAnimationFrame(() => {
+                entries.forEach(() => {
+                  // Handle resize if needed
+                });
               });
             });
-          });
-          observerRef.current.observe(el);
+            observerRef.current.observe(domElement);
+          }
         }
       }}
       className={cn(
