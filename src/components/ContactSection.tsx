@@ -55,14 +55,23 @@ const ContactSection = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.functions.invoke('send-contact-email', {
+      const { data, error } = await supabase.functions.invoke('send-contact-email', {
         body: formData
       });
 
       if (error) throw error;
 
+      if (data?.error) {
+        toast({
+          variant: "destructive",
+          title: "Message Not Sent",
+          description: data.details || "Please try again later or contact us directly.",
+        });
+        return;
+      }
+
       toast({
-        title: "Message Sent Successfully!",
+        title: "Message Received!",
         description: "Thank you for contacting us. We'll get back to you soon.",
       });
 
@@ -73,7 +82,7 @@ const ContactSection = () => {
       toast({
         variant: "destructive",
         title: "Failed to Send Message",
-        description: "Please try again later or contact us directly.",
+        description: error.details || "Please try again later or contact us directly at brianrop36@gmail.com",
       });
     } finally {
       setIsLoading(false);

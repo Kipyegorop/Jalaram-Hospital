@@ -26,7 +26,7 @@ serve(async (req) => {
     // In development, we'll send to brianrop36@gmail.com
     // In production, you should use a verified domain
     const { data, error } = await resend.emails.send({
-      from: 'Hospital Contact <brianrop36@gmail.com>',
+      from: 'Hospital Contact <onboarding@resend.dev>', // Using Resend's default verified domain
       to: ['brianrop36@gmail.com'],
       subject: `New Contact Form Message from ${name}`,
       reply_to: email,
@@ -61,10 +61,9 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in send-contact-email:', error);
     
-    // Provide a more user-friendly error message
-    const errorMessage = error.message.includes('verify a domain') 
-      ? 'Our email service is in development mode. Your message has been logged but email delivery is limited. Please contact us directly at brianrop36@gmail.com.'
-      : 'Failed to send message. Please try again.';
+    const errorMessage = error.message?.includes('domain is not verified') 
+      ? 'We are currently setting up our email service. Your message has been logged, and we will get back to you soon. For immediate assistance, please contact us directly at brianrop36@gmail.com.'
+      : 'Failed to send message. Please try again later or contact us directly.';
     
     return new Response(
       JSON.stringify({ 
