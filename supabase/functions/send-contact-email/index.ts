@@ -23,10 +23,13 @@ serve(async (req) => {
       throw new Error('Missing required fields');
     }
 
+    // In development, we'll send to brianrop36@gmail.com
+    // In production, you should use a verified domain
     const { data, error } = await resend.emails.send({
-      from: 'Hospital Contact <onboarding@resend.dev>',
-      to: ['kipyegobrian339@gmail.com'],
+      from: 'Hospital Contact <brianrop36@gmail.com>',
+      to: ['brianrop36@gmail.com'],
       subject: `New Contact Form Message from ${name}`,
+      reply_to: email,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #221F26;">New Contact Form Submission</h2>
@@ -57,10 +60,16 @@ serve(async (req) => {
     )
   } catch (error) {
     console.error('Error in send-contact-email:', error);
+    
+    // Provide a more user-friendly error message
+    const errorMessage = error.message.includes('verify a domain') 
+      ? 'Our email service is in development mode. Your message has been logged but email delivery is limited. Please contact us directly at brianrop36@gmail.com.'
+      : 'Failed to send message. Please try again.';
+    
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        details: 'Failed to send message. Please try again.' 
+        details: errorMessage
       }),
       { 
         headers: { 
