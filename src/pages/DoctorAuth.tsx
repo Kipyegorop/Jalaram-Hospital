@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -49,10 +50,10 @@ const DoctorAuth = () => {
         const { data: doctorData, error } = await supabase
           .from('doctors')
           .select('*')
-          .eq('email', session.user.email)
-          .single();
+          .eq('id', session.user.id)
+          .maybeSingle();
 
-        if (error || !doctorData) {
+        if (error) {
           await supabase.auth.signOut();
           toast({
             variant: "destructive",
@@ -62,9 +63,9 @@ const DoctorAuth = () => {
           return;
         }
 
-        if (!doctorData.is_profile_complete) {
+        if (doctorData && !doctorData.is_profile_complete) {
           setShowProfileForm(true);
-        } else {
+        } else if (doctorData && doctorData.is_profile_complete) {
           navigate('/doctor-dashboard');
         }
       }
@@ -77,10 +78,10 @@ const DoctorAuth = () => {
         const { data: doctorData, error } = await supabase
           .from('doctors')
           .select('*')
-          .eq('email', session.user.email)
-          .single();
+          .eq('id', session.user.id)
+          .maybeSingle();
 
-        if (error || !doctorData) {
+        if (error) {
           await supabase.auth.signOut();
           toast({
             variant: "destructive",
@@ -90,9 +91,9 @@ const DoctorAuth = () => {
           return;
         }
 
-        if (!doctorData.is_profile_complete) {
+        if (doctorData && !doctorData.is_profile_complete) {
           setShowProfileForm(true);
-        } else {
+        } else if (doctorData && doctorData.is_profile_complete) {
           navigate('/doctor-dashboard');
         }
       }
@@ -104,7 +105,6 @@ const DoctorAuth = () => {
   const handleEmailPasswordSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate inputs
     if (!email || !password || !department) {
       toast({
         variant: "destructive",
@@ -117,13 +117,12 @@ const DoctorAuth = () => {
     try {
       setLoading(true);
 
-      // First check if the doctor exists in our system
       const { data: doctorData, error: doctorError } = await supabase
         .from('doctors')
         .select('*')
         .eq('email', email)
         .eq('department', department)
-        .single();
+        .maybeSingle();
 
       if (doctorError || !doctorData) {
         toast({
@@ -134,7 +133,6 @@ const DoctorAuth = () => {
         return;
       }
 
-      // Attempt to sign in
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -158,7 +156,19 @@ const DoctorAuth = () => {
       }
 
       if (data.user) {
-        if (!doctorData.is_profile_complete) {
+        const { data: doctor, error: updateError } = await supabase
+          .from('doctors')
+          .update({ id: data.user.id })
+          .eq('email', email)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error('Error updating doctor id:', updateError);
+          return;
+        }
+
+        if (!doctor.is_profile_complete) {
           setShowProfileForm(true);
         } else {
           navigate('/doctor-dashboard');
@@ -199,9 +209,10 @@ const DoctorAuth = () => {
           name,
           phone_number: phoneNumber,
           medical_license: medicalLicense,
-          is_profile_complete: true
+          is_profile_complete: true,
+          id: user.id
         })
-        .eq('email', user.email);
+        .eq('id', user.id);
 
       if (updateError) throw updateError;
 
@@ -210,6 +221,7 @@ const DoctorAuth = () => {
         description: "Profile updated successfully.",
       });
 
+      setShowProfileForm(false);
       navigate('/doctor-dashboard');
     } catch (error: any) {
       toast({
