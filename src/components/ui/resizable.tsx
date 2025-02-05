@@ -1,22 +1,52 @@
+
 import { GripVertical } from "lucide-react"
 import * as ResizablePrimitive from "react-resizable-panels"
-
+import { useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 
 const ResizablePanelGroup = ({
   className,
   ...props
-}: React.ComponentProps<typeof ResizablePrimitive.PanelGroup>) => (
-  <ResizablePrimitive.PanelGroup
-    className={cn(
-      "flex h-full w-full data-[panel-group-direction=vertical]:flex-col",
-      className
-    )}
-    {...props}
-  />
-)
+}: React.ComponentProps<typeof ResizablePrimitive.PanelGroup>) => {
+  const observerRef = useRef<ResizeObserver | null>(null);
+  const elementRef = useRef<HTMLDivElement | null>(null);
 
-const ResizablePanel = ResizablePrimitive.Panel
+  useEffect(() => {
+    // Cleanup function to disconnect observer
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, []);
+
+  return (
+    <ResizablePrimitive.PanelGroup
+      ref={(el) => {
+        elementRef.current = el as HTMLDivElement;
+        // Only create new observer if needed
+        if (el && !observerRef.current) {
+          observerRef.current = new ResizeObserver((entries) => {
+            // Use requestAnimationFrame to throttle updates
+            window.requestAnimationFrame(() => {
+              entries.forEach(() => {
+                // Handle resize if needed
+              });
+            });
+          });
+          observerRef.current.observe(el);
+        }
+      }}
+      className={cn(
+        "flex h-full w-full data-[panel-group-direction=vertical]:flex-col",
+        className
+      )}
+      {...props}
+    />
+  );
+};
+
+const ResizablePanel = ResizablePrimitive.Panel;
 
 const ResizableHandle = ({
   withHandle,
@@ -38,6 +68,6 @@ const ResizableHandle = ({
       </div>
     )}
   </ResizablePrimitive.PanelResizeHandle>
-)
+);
 
-export { ResizablePanelGroup, ResizablePanel, ResizableHandle }
+export { ResizablePanelGroup, ResizablePanel, ResizableHandle };
