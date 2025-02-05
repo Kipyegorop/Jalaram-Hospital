@@ -42,14 +42,17 @@ export const SignInForm = ({ setShowProfileForm, departments }: SignInFormProps)
     try {
       setLoading(true);
 
-      const { data: doctorData, error: doctorError } = await supabase
+      const { data: doctors, error: doctorError } = await supabase
         .from('doctors')
-        .select('*')
+        .select()
         .eq('email', email)
-        .eq('department', department)
-        .maybeSingle();
+        .eq('department', department);
 
-      if (doctorError || !doctorData) {
+      if (doctorError) {
+        throw doctorError;
+      }
+
+      if (!doctors || doctors.length === 0) {
         toast({
           variant: "destructive",
           title: "Access Denied",
