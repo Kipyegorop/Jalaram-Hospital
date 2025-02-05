@@ -42,32 +42,14 @@ export const SignInForm = ({ setShowProfileForm, departments }: SignInFormProps)
     try {
       setLoading(true);
 
-      const { data: doctors, error: doctorError } = await supabase
-        .from('doctors')
-        .select()
-        .eq('email', email)
-        .eq('department', department);
-
-      if (doctorError) {
-        throw doctorError;
-      }
-
-      if (!doctors || doctors.length === 0) {
-        toast({
-          variant: "destructive",
-          title: "Access Denied",
-          description: "You are not authorized for this department or email is not registered.",
-        });
-        return;
-      }
-
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // First authenticate the user
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) {
-        if (error.message === "Invalid login credentials") {
+      if (authError) {
+        if (authError.message === "Invalid login credentials") {
           toast({
             variant: "destructive",
             title: "Invalid Credentials",
@@ -77,31 +59,37 @@ export const SignInForm = ({ setShowProfileForm, departments }: SignInFormProps)
           toast({
             variant: "destructive",
             title: "Login Error",
-            description: error.message,
+            description: authError.message,
           });
         }
         return;
       }
 
-      if (data.user) {
-        const { data: doctor, error: updateError } = await supabase
-          .from('doctors')
-          .update({ id: data.user.id })
-          .eq('email', email)
-          .select()
-          .single();
+      // Then check if they're a doctor with the right department
+      const { data: doctor, error: doctorError } = await supabase
+        .from('doctors')
+        .select('is_profile_complete')
+        .eq('email', email)
+        .eq('department', department)
+        .maybeSingle();
 
-        if (updateError) {
-          console.error('Error updating doctor id:', updateError);
-          return;
-        }
-
-        if (!doctor.is_profile_complete) {
-          setShowProfileForm(true);
-        } else {
-          navigate('/doctor-dashboard');
-        }
+      if (doctorError || !doctor) {
+        await supabase.auth.signOut();
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "You are not authorized for this department or email is not registered.",
+        });
+        return;
       }
+
+      // Redirect based on profile completion
+      if (!doctor.is_profile_complete) {
+        setShowProfileForm(true);
+      } else {
+        navigate('/doctor-dashboard');
+      }
+      
     } catch (error: any) {
       toast({
         variant: "destructive",
