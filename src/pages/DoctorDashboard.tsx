@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -65,9 +66,13 @@ const DoctorDashboard = () => {
   const form = useForm<ProfileFormValues>();
 
   useEffect(() => {
-    checkProfileCompletion();
-    fetchDoctorInfo();
-    fetchAppointments();
+    const initializeDashboard = async () => {
+      await checkProfileCompletion();
+      await fetchDoctorInfo();
+      await fetchAppointments();
+    };
+
+    initializeDashboard();
 
     // Set up real-time subscription for appointment updates
     const channel = supabase
@@ -80,7 +85,7 @@ const DoctorDashboard = () => {
           table: 'appointments'
         },
         (payload) => {
-          console.log('Real-time update:', payload);
+          console.log('Real-time update received:', payload);
           fetchAppointments(); // Refresh appointments when changes occur
         }
       )
@@ -152,9 +157,13 @@ const DoctorDashboard = () => {
         .eq("email", user.email)
         .single();
       
+      if (error) {
+        console.error('Error fetching doctor info:', error);
+        return;
+      }
+      
       if (doctor) {
         setDoctorData(doctor);
-        // Just set the full name without adding "Dr" (it will be added in the UI)
         setDoctorName(doctor.name);
       }
     }
@@ -167,7 +176,10 @@ const DoctorDashboard = () => {
 
   const fetchAppointments = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      console.error('No authenticated user found');
+      return;
+    }
 
     // First get the doctor's ID
     const { data: doctorData, error: doctorError } = await supabase
@@ -181,6 +193,8 @@ const DoctorDashboard = () => {
       return;
     }
 
+    console.log('Fetching appointments for doctor ID:', doctorData.id);
+
     // Then fetch appointments using the doctor's ID
     const { data, error } = await supabase
       .from("appointments")
@@ -189,6 +203,7 @@ const DoctorDashboard = () => {
       .order("appointment_date", { ascending: true });
 
     if (error) {
+      console.error('Error fetching appointments:', error);
       toast({
         title: "Error",
         description: "Failed to fetch appointments",
