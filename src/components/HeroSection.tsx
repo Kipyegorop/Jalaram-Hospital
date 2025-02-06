@@ -1,3 +1,4 @@
+
 import {
   Carousel,
   CarouselContent,
@@ -67,10 +68,10 @@ const HeroSection = () => {
                       <h1 className="text-3xl md:text-5xl font-bold mb-4">{slide.title}</h1>
                       <p className="text-lg md:text-xl mb-8">{slide.description}</p>
                       <div className="flex flex-col sm:flex-row gap-4 sm:space-x-4">
-                        <Button size="lg" className="w-full sm:w-auto">
+                        <Button size="lg" className="w-full sm:w-auto bg-[#622426] hover:bg-[#622426]/90">
                           {slide.primaryButton}
                         </Button>
-                        <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                        <Button variant="outline" size="lg" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-[#622426]">
                           {slide.secondaryButton}
                         </Button>
                       </div>
