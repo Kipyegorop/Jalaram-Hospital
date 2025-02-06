@@ -68,7 +68,7 @@ export const SignInForm = ({ setShowProfileForm, departments }: SignInFormProps)
       // Then check if they're a doctor with the right department
       const { data: doctor, error: doctorError } = await supabase
         .from('doctors')
-        .select('is_profile_complete')
+        .select()
         .eq('email', email)
         .eq('department', department)
         .maybeSingle();

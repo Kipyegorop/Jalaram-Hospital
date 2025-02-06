@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -16,18 +17,36 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { User, KeyRound, Upload } from "lucide-react";
+import { User, KeyRound } from "lucide-react";
+
+// Department-specific avatar mappings
+const getDepartmentAvatar = (department: string) => {
+  switch (department?.toLowerCase()) {
+    case 'general medicine':
+      return 'https://api.dicebear.com/7.x/personas/svg?seed=general&backgroundColor=b6e3f4';
+    case 'pediatrics':
+      return 'https://api.dicebear.com/7.x/personas/svg?seed=pediatrics&backgroundColor=ffdfba';
+    case 'orthopedics':
+      return 'https://api.dicebear.com/7.x/personas/svg?seed=ortho&backgroundColor=d4a373';
+    case 'cardiology':
+      return 'https://api.dicebear.com/7.x/personas/svg?seed=cardio&backgroundColor=ff9b85';
+    case 'dermatology':
+      return 'https://api.dicebear.com/7.x/personas/svg?seed=derma&backgroundColor=ddbea9';
+    case 'neurology':
+      return 'https://api.dicebear.com/7.x/personas/svg?seed=neuro&backgroundColor=98c1d9';
+    default:
+      return 'https://api.dicebear.com/7.x/personas/svg?seed=default&backgroundColor=b7b7a4';
+  }
+};
 
 export const DoctorProfileMenu = ({ doctorData }: { doctorData: any }) => {
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
 
   const handlePasswordReset = async () => {
@@ -63,46 +82,6 @@ export const DoctorProfileMenu = ({ doctorData }: { doctorData: any }) => {
     }
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      setUploading(true);
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${doctorData.id}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('profile_pictures')
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      const { error: updateError } = await supabase
-        .from('doctors')
-        .update({ profile_picture: filePath })
-        .eq('id', doctorData.id);
-
-      if (updateError) throw updateError;
-
-      toast({
-        title: "Success",
-        description: "Profile picture updated successfully.",
-      });
-
-      // Refresh the page to show the new profile picture
-      window.location.reload();
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    } finally {
-      setUploading(false);
-    }
-  };
-
   return (
     <>
       <DropdownMenu>
@@ -110,13 +89,7 @@ export const DoctorProfileMenu = ({ doctorData }: { doctorData: any }) => {
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
             <Avatar className="h-10 w-10">
               <AvatarImage
-                src={
-                  doctorData.profile_picture
-                    ? `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/profile_pictures/${
-                        doctorData.profile_picture
-                      }`
-                    : undefined
-                }
+                src={getDepartmentAvatar(doctorData.department)}
                 alt={doctorData.name}
               />
               <AvatarFallback>{doctorData.name?.[0]?.toUpperCase()}</AvatarFallback>
@@ -134,20 +107,6 @@ export const DoctorProfileMenu = ({ doctorData }: { doctorData: any }) => {
             <KeyRound className="mr-2 h-4 w-4" />
             Change Password
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Upload className="mr-2 h-4 w-4" />
-            <Label htmlFor="picture" className="cursor-pointer">
-              Upload Picture
-            </Label>
-            <Input
-              id="picture"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageUpload}
-              disabled={uploading}
-            />
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -161,23 +120,23 @@ export const DoctorProfileMenu = ({ doctorData }: { doctorData: any }) => {
           <div className="space-y-4">
             <div>
               <Label>Name</Label>
-              <Input value={doctorData.name} disabled />
+              <div className="p-2 bg-gray-100 rounded">{doctorData.name}</div>
             </div>
             <div>
               <Label>Email</Label>
-              <Input value={doctorData.email} disabled />
+              <div className="p-2 bg-gray-100 rounded">{doctorData.email}</div>
             </div>
             <div>
               <Label>Department</Label>
-              <Input value={doctorData.department} disabled />
+              <div className="p-2 bg-gray-100 rounded">{doctorData.department}</div>
             </div>
             <div>
               <Label>Specialization</Label>
-              <Input value={doctorData.specialization || 'Not specified'} disabled />
+              <div className="p-2 bg-gray-100 rounded">{doctorData.specialization || 'Not specified'}</div>
             </div>
             <div>
               <Label>Experience</Label>
-              <Input value={doctorData.experience || 'Not specified'} disabled />
+              <div className="p-2 bg-gray-100 rounded">{doctorData.experience || 'Not specified'}</div>
             </div>
           </div>
         </DialogContent>
@@ -193,18 +152,20 @@ export const DoctorProfileMenu = ({ doctorData }: { doctorData: any }) => {
           <div className="space-y-4">
             <div>
               <Label>New Password</Label>
-              <Input
+              <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-2 border rounded"
               />
             </div>
             <div>
               <Label>Confirm Password</Label>
-              <Input
+              <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full p-2 border rounded"
               />
             </div>
             <Button onClick={handlePasswordReset} className="w-full">

@@ -71,7 +71,7 @@ const HeroSection = () => {
                         <Button size="lg" className="w-full sm:w-auto bg-[#622426] hover:bg-[#622426]/90">
                           {slide.primaryButton}
                         </Button>
-                        <Button variant="outline" size="lg" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-[#622426]">
+                        <Button variant="outline" size="lg" className="w-full sm:w-auto border-white text-[#622426] hover:bg-white hover:text-[#622426] bg-white">
                           {slide.secondaryButton}
                         </Button>
                       </div>
