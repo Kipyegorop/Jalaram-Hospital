@@ -12,24 +12,30 @@ import { useRef } from "react";
 const slides = [
   {
     image: "https://images.pexels.com/photos/247786/pexels-photo-247786.jpeg",
-    title: "Welcome to Our Hospital",
+    title: "Welcome to Jalaram Diagnostic Center",
     description: "Providing Quality Healthcare Services",
     primaryButton: "Book Appointment",
-    secondaryButton: "Learn More"
+    primaryButtonLink: "/AppointmentModal",
+    secondaryButton: "Learn More",
+    secondaryButtonLink: "/about-us"
   },
   {
     image: "https://images.pexels.com/photos/3259624/pexels-photo-3259624.jpeg",
-    title: "Expert Medical Care",
-    description: "Advanced Technology & Experienced Professionals",
+    title: "Your Checkups aren't just for you",
+    description: "Theyre good for the whole team. We make it easy for you to stay on the ball with all your health needds. Don't just do it fo you. Do it for the team.",
     primaryButton: "Our Services",
-    secondaryButton: "Contact Us"
+    primaryButtonLink: "/services",
+    secondaryButton: "Contact Us",
+    secondaryButtonLink: "/contact-us"
   },
   {
     image: "https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg",
-    title: "24/7 Emergency Care",
-    description: "Always Ready to Help You",
+    title: "Your screenings arent just for you",
+    description: "Theyre good for the whole crew. We make it easy to manage all your health needs. Because when youre well, everyone stays in perfect harmony.",
     primaryButton: "Emergency Contact",
-    secondaryButton: "Learn More"
+    primaryButtonLink: "/emergency-contact",
+    secondyButton: "Learn More",
+    secondaryButtonLink: "/learn-more"
   }
 ];
 

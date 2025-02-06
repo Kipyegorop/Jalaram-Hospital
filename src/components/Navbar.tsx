@@ -13,9 +13,9 @@ const Navbar = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Heart className="w-8 h-8 text-white" />
+            
             <a href="/" className="text-2xl font-bold text-white">
-              Hospital Logo
+              Jalaram Hospital
             </a>
           </div>
 
@@ -41,7 +41,7 @@ const Navbar = () => {
             <Button 
               variant="outline"
               onClick={() => navigate("/doctor-auth")}
-              className="flex items-center gap-2 text-white border-white hover:bg-white hover:text-[#221F26]"
+              className="flex items-center gap-2 text-black border-white hover:bg-white hover:text-[#221F26]"
             >
               <LogIn className="w-4 h-4" />
               Doctor Login
