@@ -154,9 +154,8 @@ const DoctorDashboard = () => {
       
       if (doctor) {
         setDoctorData(doctor);
-        // Extract first name
-        const firstName = doctor.name.split(' ')[0];
-        setDoctorName(firstName);
+        // Just set the full name without adding "Dr" (it will be added in the UI)
+        setDoctorName(doctor.name);
       }
     }
   };
@@ -167,8 +166,22 @@ const DoctorDashboard = () => {
   };
 
   const fetchAppointments = async () => {
-    if (!doctorData) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
+    // First get the doctor's ID
+    const { data: doctorData, error: doctorError } = await supabase
+      .from("doctors")
+      .select("id")
+      .eq("email", user.email)
+      .single();
+
+    if (doctorError || !doctorData) {
+      console.error('Error fetching doctor data:', doctorError);
+      return;
+    }
+
+    // Then fetch appointments using the doctor's ID
     const { data, error } = await supabase
       .from("appointments")
       .select("*")
@@ -184,6 +197,7 @@ const DoctorDashboard = () => {
       return;
     }
 
+    console.log('Fetched appointments:', data);
     setAppointments(data || []);
   };
 

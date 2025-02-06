@@ -101,7 +101,7 @@ export const DoctorProfileMenu = ({ doctorData }: { doctorData: any }) => {
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
             <User className="mr-2 h-4 w-4" />
-            Profile
+            View Profile
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setShowPasswordDialog(true)}>
             <KeyRound className="mr-2 h-4 w-4" />
@@ -110,7 +110,7 @@ export const DoctorProfileMenu = ({ doctorData }: { doctorData: any }) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Profile Dialog */}
+      {/* Profile Dialog - Read Only */}
       <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
         <DialogContent>
           <DialogHeader>
