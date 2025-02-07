@@ -64,39 +64,39 @@ export type Database = {
           created_at: string | null
           department: string
           email: string
-          experience: string | null
+          experience: string
           id: string
           is_profile_complete: boolean | null
-          medical_license: string | null
+          medical_license: string
           name: string | null
-          phone_number: string | null
-          specialization: string | null
+          phone_number: string
+          specialization: string
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           department: string
           email: string
-          experience?: string | null
+          experience: string
           id: string
           is_profile_complete?: boolean | null
-          medical_license?: string | null
+          medical_license: string
           name?: string | null
-          phone_number?: string | null
-          specialization?: string | null
+          phone_number: string
+          specialization: string
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           department?: string
           email?: string
-          experience?: string | null
+          experience?: string
           id?: string
           is_profile_complete?: boolean | null
-          medical_license?: string | null
+          medical_license?: string
           name?: string | null
-          phone_number?: string | null
-          specialization?: string | null
+          phone_number?: string
+          specialization?: string
           updated_at?: string | null
         }
         Relationships: []

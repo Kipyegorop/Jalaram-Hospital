@@ -1,4 +1,3 @@
-
 import {
   Carousel,
   CarouselContent,
@@ -27,15 +26,15 @@ const slides = [
     primaryButton: "Our Services",
     primaryButtonLink: "/services",
     secondaryButton: "Contact Us",
-    secondaryButtonLink: "/contact-us"
+    secondaryButtonLink: "https://wa.me/254795553008"
   },
   {
     image: "https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg",
     title: "Your screenings arent just for you",
     description: "Theyre good for the whole crew. We make it easy to manage all your health needs. Because when youre well, everyone stays in perfect harmony.",
     primaryButton: "Emergency Contact",
-    primaryButtonLink: "/emergency-contact",
-    secondyButton: "Learn More",
+    primaryButtonLink: "https://wa.me/254795553008?text=Emergency:%20I%20need%20immediate%20medical%20assistance",
+    secondaryButton: "Learn More",
     secondaryButtonLink: "/learn-more"
   }
 ];
@@ -44,6 +43,14 @@ const HeroSection = () => {
   const plugin = useRef(
     Autoplay({ delay: 5000, stopOnInteraction: true })
   );
+
+  const handleButtonClick = (link: string) => {
+    if (link.startsWith('https://wa.me')) {
+      window.open(link, '_blank');
+    } else {
+      window.location.href = link;
+    }
+  };
 
   return (
     <section className="relative">
@@ -68,10 +75,19 @@ const HeroSection = () => {
                       <h1 className="text-3xl md:text-5xl font-bold mb-4">{slide.title}</h1>
                       <p className="text-lg md:text-xl mb-8">{slide.description}</p>
                       <div className="flex flex-col sm:flex-row gap-4 sm:space-x-4">
-                        <Button size="lg" className="w-full sm:w-auto bg-[#622426] hover:bg-[#622426]/90">
+                        <Button 
+                          size="lg" 
+                          className="w-full sm:w-auto bg-[#622426] hover:bg-[#622426]/90"
+                          onClick={() => handleButtonClick(slide.primaryButtonLink)}
+                        >
                           {slide.primaryButton}
                         </Button>
-                        <Button variant="outline" size="lg" className="w-full sm:w-auto border-white text-[#622426] hover:bg-white hover:text-[#622426] bg-white">
+                        <Button 
+                          variant="outline" 
+                          size="lg" 
+                          className="w-full sm:w-auto border-white text-[#622426] hover:bg-white hover:text-[#622426] bg-white"
+                          onClick={() => handleButtonClick(slide.secondaryButtonLink)}
+                        >
                           {slide.secondaryButton}
                         </Button>
                       </div>
