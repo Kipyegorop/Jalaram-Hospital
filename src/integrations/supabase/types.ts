@@ -9,6 +9,98 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          appointment_date: string
+          appointment_time: string
+          created_at: string | null
+          doctor_id: string | null
+          id: string
+          patient_email: string
+          patient_name: string
+          patient_phone: string
+          reason: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          appointment_date: string
+          appointment_time: string
+          created_at?: string | null
+          doctor_id?: string | null
+          id?: string
+          patient_email: string
+          patient_name: string
+          patient_phone: string
+          reason?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          appointment_date?: string
+          appointment_time?: string
+          created_at?: string | null
+          doctor_id?: string | null
+          id?: string
+          patient_email?: string
+          patient_name?: string
+          patient_phone?: string
+          reason?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doctors: {
+        Row: {
+          created_at: string | null
+          department: string
+          email: string
+          experience: string | null
+          id: string
+          is_profile_complete: boolean | null
+          medical_license: string | null
+          name: string | null
+          phone_number: string | null
+          specialization: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          department: string
+          email: string
+          experience?: string | null
+          id: string
+          is_profile_complete?: boolean | null
+          medical_license?: string | null
+          name?: string | null
+          phone_number?: string | null
+          specialization?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          department?: string
+          email?: string
+          experience?: string | null
+          id?: string
+          is_profile_complete?: boolean | null
+          medical_license?: string | null
+          name?: string | null
+          phone_number?: string | null
+          specialization?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       faqs: {
         Row: {
           answer: string
