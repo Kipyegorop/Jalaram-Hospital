@@ -5,10 +5,10 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Button } from "@/components/ui/button";
 import Autoplay from "embla-carousel-autoplay";
 import { useRef } from "react";
-import AppointmentModal from "./AppointmentModal";
+import HeroSlide from "./hero/HeroSlide";
+import SlideContent from "./hero/SlideContent";
 
 const slides = [
   {
@@ -51,7 +51,6 @@ const HeroSection = () => {
     } else if (action === "emergency") {
       window.open("https://wa.me/254795553008?text=Emergency:%20I%20need%20immediate%20medical%20assistance", "_blank");
     } else if (action === "appointment") {
-      // The AppointmentModal handles its own visibility
       return;
     } else if (link) {
       window.location.href = link;
@@ -69,42 +68,12 @@ const HeroSection = () => {
         <CarouselContent>
           {slides.map((slide, index) => (
             <CarouselItem key={index}>
-              <div className="relative h-[calc(100vh-4rem)]">
-                <img
-                  src={slide.image}
-                  alt={slide.title}
-                  className="w-full h-full object-cover"
+              <HeroSlide image={slide.image}>
+                <SlideContent
+                  {...slide}
+                  onButtonClick={handleButtonClick}
                 />
-                <div className="absolute inset-0 bg-[#221F26]/60">
-                  <div className="container mx-auto px-4 h-full flex items-center">
-                    <div className="max-w-2xl text-white">
-                      <h1 className="text-3xl md:text-5xl font-bold mb-4">{slide.title}</h1>
-                      <p className="text-lg md:text-xl mb-8">{slide.description}</p>
-                      <div className="flex flex-col sm:flex-row gap-4 sm:space-x-4">
-                        {slide.primaryButtonAction === "appointment" ? (
-                          <AppointmentModal />
-                        ) : (
-                          <Button 
-                            size="lg" 
-                            className="w-full sm:w-auto bg-[#622426] hover:bg-[#622426]/90"
-                            onClick={() => handleButtonClick(slide.primaryButtonAction, slide.primaryButtonLink)}
-                          >
-                            {slide.primaryButton}
-                          </Button>
-                        )}
-                        <Button 
-                          variant="outline" 
-                          size="lg" 
-                          className="w-full sm:w-auto border-white text-[#622426] hover:bg-white hover:text-[#622426] bg-white"
-                          onClick={() => handleButtonClick(slide.secondaryButtonAction, slide.secondaryButtonLink)}
-                        >
-                          {slide.secondaryButton}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              </HeroSlide>
             </CarouselItem>
           ))}
         </CarouselContent>
