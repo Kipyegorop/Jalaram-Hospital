@@ -19,13 +19,37 @@ interface AppointmentEmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  console.log("Received request:", req.method);
+  
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { 
+      headers: {
+        ...corsHeaders,
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      }
+    });
   }
 
   try {
-    const { name, email, date, time, department }: AppointmentEmailRequest = await req.json();
+    const body = await req.json();
+    console.log("Received request body:", body);
+
+    const { name, email, date, time, department }: AppointmentEmailRequest = body;
+
+    if (!name || !email || !date || !time || !department) {
+      console.error("Missing required fields in request");
+      return new Response(
+        JSON.stringify({ error: "Missing required fields" }),
+        {
+          status: 400,
+          headers: { 
+            "Content-Type": "application/json",
+            ...corsHeaders
+          },
+        }
+      );
+    }
 
     const emailResponse = await resend.emails.send({
       from: "Hospital Appointments <onboarding@resend.dev>",
@@ -58,10 +82,16 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error in send-appointment-email function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.toString() 
+      }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
+        headers: { 
+          "Content-Type": "application/json",
+          ...corsHeaders 
+        },
       }
     );
   }
