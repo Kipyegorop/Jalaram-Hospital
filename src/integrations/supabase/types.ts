@@ -130,7 +130,13 @@ export type Database = {
       [_ in never]: never
     }
     CompositeTypes: {
-      [_ in never]: never
+      json: {
+        public_tables: Json | null
+        public_views: Json | null
+        public_functions: Json | null
+        public_enums: Json | null
+        public_composite_types: Json | null
+      }
     }
   }
 }
