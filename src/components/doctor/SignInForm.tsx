@@ -42,7 +42,6 @@ export const SignInForm = ({ setShowProfileForm, departments }: SignInFormProps)
     try {
       setLoading(true);
 
-      // First authenticate the user
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -52,7 +51,7 @@ export const SignInForm = ({ setShowProfileForm, departments }: SignInFormProps)
         toast({
           variant: "destructive",
           title: "Login Error",
-          description: "Invalid email or password. Please check your credentials and try again.",
+          description: "Invalid email or password. Please contact the administrator if you need access.",
         });
         return;
       }
@@ -70,7 +69,7 @@ export const SignInForm = ({ setShowProfileForm, departments }: SignInFormProps)
         toast({
           variant: "destructive",
           title: "Access Denied",
-          description: "You are not authorized for this department or email is not registered.",
+          description: "You are not authorized for this department.",
         });
         return;
       }
@@ -100,7 +99,7 @@ export const SignInForm = ({ setShowProfileForm, departments }: SignInFormProps)
           <Mail className="h-4 w-4 text-gray-500" />
           <Input
             type="email"
-            placeholder="Email"
+            placeholder="Hospital Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -145,6 +144,10 @@ export const SignInForm = ({ setShowProfileForm, departments }: SignInFormProps)
           </>
         )}
       </Button>
+
+      <p className="text-sm text-center text-gray-500 mt-4">
+        For access to the doctor portal, please contact the hospital administrator.
+      </p>
     </form>
   );
 };
