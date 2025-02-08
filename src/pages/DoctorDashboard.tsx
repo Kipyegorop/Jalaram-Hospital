@@ -28,8 +28,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Phone, Clock, Mail, MessageSquare, LogOut, Calendar, Users, Activity } from "lucide-react";
+import { Phone, Clock, Mail, MessageSquare, LogOut, Calendar, Users, Activity, UserRound, Printer } from "lucide-react";
 import { useForm } from "react-hook-form";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { Textarea } from "@/components/ui/textarea";
 import { DoctorProfileMenu } from "@/components/DoctorProfileMenu";
 import type { Database } from "@/integrations/supabase/types";
@@ -288,7 +293,53 @@ const DoctorDashboard = () => {
   };
 
   const handleWhatsApp = (phoneNumber: string) => {
-    window.location.href = `https://wa.me/${phoneNumber.replace(/\D/g, '')}`;
+    // Remove any non-numeric characters from the phone number
+    const formattedNumber = phoneNumber.replace(/\D/g, '');
+    // Open WhatsApp with the formatted number
+    window.open(`https://wa.me/${formattedNumber}`, '_blank');
+  };
+
+  const handlePrintReports = (period: 'today' | 'all') => {
+    // Filter appointments based on period
+    const filteredAppointments = period === 'today' 
+      ? appointments.filter(apt => 
+          new Date(apt.appointment_date).toDateString() === new Date().toDateString()
+        )
+      : appointments;
+
+    // Create printable content
+    const content = document.createElement('div');
+    content.innerHTML = `
+      <h1 style="text-align: center; margin-bottom: 20px;">Appointments Report</h1>
+      <h2 style="margin-bottom: 10px;">Dr. ${doctorName}</h2>
+      <p style="margin-bottom: 20px;">Period: ${period === 'today' ? 'Today' : 'All Time'}</p>
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th style="border: 1px solid #ddd; padding: 8px;">Patient Name</th>
+            <th style="border: 1px solid #ddd; padding: 8px;">Date</th>
+            <th style="border: 1px solid #ddd; padding: 8px;">Time</th>
+            <th style="border: 1px solid #ddd; padding: 8px;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filteredAppointments.map(apt => `
+            <tr>
+              <td style="border: 1px solid #ddd; padding: 8px;">${apt.patient_name}</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">${new Date(apt.appointment_date).toLocaleDateString()}</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">${apt.appointment_time}</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">${apt.status}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+    printWindow?.document.write(content.innerHTML);
+    printWindow?.document.close();
+    printWindow?.print();
   };
 
   return (
@@ -372,7 +423,7 @@ const DoctorDashboard = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-50">
-                  <TableHead className="font-semibold">Patient Name</TableHead>
+                  <TableHead className="font-semibold">Patient Info</TableHead>
                   <TableHead className="font-semibold">Date</TableHead>
                   <TableHead className="font-semibold">Time</TableHead>
                   <TableHead className="font-semibold">Contact</TableHead>
@@ -384,7 +435,27 @@ const DoctorDashboard = () => {
               <TableBody>
                 {appointments.map((appointment) => (
                   <TableRow key={appointment.id} className="hover:bg-gray-50">
-                    <TableCell className="font-medium">{appointment.patient_name}</TableCell>
+                    <TableCell>
+                      <HoverCard>
+                        <HoverCardTrigger asChild>
+                          <div className="flex items-center gap-2 cursor-pointer">
+                            <UserRound className="h-8 w-8 text-gray-400" />
+                            <span className="font-medium">{appointment.patient_name}</span>
+                          </div>
+                        </HoverCardTrigger>
+                        <HoverCardContent className="w-80">
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-semibold">Patient Details</h4>
+                            <div className="text-sm">
+                              <p><span className="font-medium">Name:</span> {appointment.patient_name}</p>
+                              <p><span className="font-medium">Email:</span> {appointment.patient_email}</p>
+                              <p><span className="font-medium">Phone:</span> {appointment.patient_phone}</p>
+                              <p><span className="font-medium">Reason:</span> {appointment.reason}</p>
+                            </div>
+                          </div>
+                        </HoverCardContent>
+                      </HoverCard>
+                    </TableCell>
                     <TableCell>{new Date(appointment.appointment_date).toLocaleDateString()}</TableCell>
                     <TableCell>{appointment.appointment_time}</TableCell>
                     <TableCell>
@@ -445,6 +516,28 @@ const DoctorDashboard = () => {
                 ))}
               </TableBody>
             </Table>
+          </div>
+
+          {/* Print Reports Buttons */}
+          <div className="p-6 border-t border-gray-100">
+            <div className="flex gap-4 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => handlePrintReports('today')}
+                className="flex items-center gap-2"
+              >
+                <Printer className="h-4 w-4" />
+                Print Today's Reports
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handlePrintReports('all')}
+                className="flex items-center gap-2"
+              >
+                <Printer className="h-4 w-4" />
+                Print All Reports
+              </Button>
+            </div>
           </div>
         </div>
       </div>
