@@ -25,7 +25,7 @@ const slides = [
     title: "Your Checkups aren't just for you",
     description: "They're good for the whole team. We make it easy for you to stay on the ball with all your health needs. Don't just do it for you. Do it for the team.",
     primaryButton: "Our Services",
-    primaryButtonLink: "/services",
+    primaryButtonLink: "./ServicesSection",
     secondaryButton: "Contact Us",
     secondaryButtonAction: "whatsapp"
   },
