@@ -28,6 +28,7 @@ const departments = [
   "Cardiology",
   "Dermatology",
   "Neurology",
+  "Dentist",
 ];
 
 const AppointmentForm = () => {

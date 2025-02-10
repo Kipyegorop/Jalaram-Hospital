@@ -45,7 +45,7 @@ const PersonalInfoFields = ({ form }: PersonalInfoFieldsProps) => {
           <FormItem>
             <FormLabel>Phone Number</FormLabel>
             <FormControl>
-              <Input placeholder="+254 XXX XXX XXX" {...field} required />
+              <Input placeholder="07XX XX XXXX" {...field} required />
             </FormControl>
             <FormMessage />
           </FormItem>

@@ -13,7 +13,7 @@ import SlideContent from "./hero/SlideContent";
 const slides = [
   {
     image: "https://images.pexels.com/photos/247786/pexels-photo-247786.jpeg",
-    title: "Welcome to Jalaram Diagnostic Center",
+    title: "Welcome to Jalaram St. Christopher Diagnostic Hospital",
     description: "Providing Quality Healthcare Services",
     primaryButton: "Book Appointment",
     primaryButtonAction: "appointment",
